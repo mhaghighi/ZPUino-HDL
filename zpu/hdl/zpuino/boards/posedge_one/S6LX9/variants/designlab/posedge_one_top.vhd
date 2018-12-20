@@ -272,7 +272,7 @@ architecture behave of ZPUino_Posedge_One_V2_blackbox is
 --  signal gpio_o:      std_logic_vector(zpuino_gpio_count-1 downto 0);
 --  signal gpio_t:      std_logic_vector(zpuino_gpio_count-1 downto 0);
 --  signal gpio_i:      std_logic_vector(zpuino_gpio_count-1 downto 0);
-  signal gpio_o_reg:      std_logic_vector(54 downto 0);
+  signal gpio_o_reg:      std_logic_vector(49 downto 0);
 
   -- constant spp_cap_in: std_logic_vector(48 downto 0) :=
     -- "0" &                -- SPI CS 
@@ -286,14 +286,14 @@ architecture behave of ZPUino_Posedge_One_V2_blackbox is
     -- "0000000000000000" &  -- Wing B
     -- "0000000000000000";   -- Wing A
 
- constant spp_cap_in: std_logic_vector(54 downto 0) :=
-   "0111111" &                -- SPI CS 
+ constant spp_cap_in: std_logic_vector(49 downto 0) :=
+   "01" &                -- SPI CS 
    "1111111111111111" &  -- Wing C
    "1111111111111111" &  -- Wing B
    "1111111111111111";   -- Wing A
 
- constant spp_cap_out: std_logic_vector(54 downto 0) :=
-   "0111111" &                -- SPI CS 
+ constant spp_cap_out: std_logic_vector(49 downto 0) :=
+   "01" &                -- SPI CS 
    "1111111111111111" &  -- Wing C
    "1111111111111111" &  -- Wing B
    "1111111111111111";   -- Wing A
@@ -420,9 +420,11 @@ architecture behave of ZPUino_Posedge_One_V2_blackbox is
 --  signal wishbone_slot_15_in_record  : wishbone_bus_in_type;
 --  signal wishbone_slot_15_out_record : wishbone_bus_out_type;  
 
-  signal gpio_bus_in_record : gpio_bus_in_duo_type;
-  signal gpio_bus_out_record : gpio_bus_out_duo_type;   
-  
+  --signal gpio_bus_in_record : gpio_bus_in_duo_type;
+  --signal gpio_bus_out_record : gpio_bus_out_duo_type;   
+  signal gpio_bus_in_record : gpio_bus_in_posedge_type; --[MH]
+  signal gpio_bus_out_record : gpio_bus_out_posedge_type;   --[MH]
+
   -- Papilio Note: Place your signal statements here. #Signal  
 
 begin
@@ -547,19 +549,19 @@ begin
   wishbone_slot_14_out_record.wb_ack_o <= wishbone_slot_14_out(1);
   wishbone_slot_14_out_record.wb_inta_o <= wishbone_slot_14_out(0); 
 
-  gpio_bus_in_record.gpio_spp_data <= gpio_bus_in(55+(PPSCOUNT_OUT-1) downto 55); -- Subtract two pins for the Timer PPS pins
-  --gpio_bus_in_record.gpio_spp_data <= gpio_bus_in(97 downto 49);
-  gpio_bus_in_record.gpio_i <= gpio_bus_in(54 downto 0);
+  gpio_bus_in_record.gpio_spp_data <= gpio_bus_in(50+(PPSCOUNT_OUT-1) downto 50); -- Subtract two pins for the Timer PPS pins
+  --gpio_bus_in_record.gpio_spp_data <= gpio_bus_in(57 downto 50);
+  gpio_bus_in_record.gpio_i <= gpio_bus_in(49 downto 0);
 
   gpio_bus_out(165) <= gpio_bus_out_record.gpio_clk;
-  gpio_bus_out(164 downto 110) <= gpio_bus_out_record.gpio_o;
-  gpio_bus_out(109 downto 55) <= gpio_bus_out_record.gpio_t;
-  gpio_bus_out(PPSCOUNT_IN-1 downto 0) <= gpio_bus_out_record.gpio_spp_read;
-  --gpio_bus_out(48 downto 0) <= gpio_bus_out_record.gpio_spp_read;
+  gpio_bus_out(159 downto 110) <= gpio_bus_out_record.gpio_o;
+  gpio_bus_out(104 downto 55) <= gpio_bus_out_record.gpio_t;
+  --gpio_bus_out(PPSCOUNT_IN-1 downto 0) <= gpio_bus_out_record.gpio_spp_read;
+  gpio_bus_out(48 downto 0) <= X"0000000000" & "000" & gpio_bus_out_record.gpio_spp_read; --[MH]
 
   gpio_bus_out_record.gpio_o <= gpio_o_reg;
   gpio_bus_out_record.gpio_clk <= sysclk;
-  LED <= '0';
+  --LED <= '0';
 
   wb_clk_i <= sysclk;
   wb_rst_i <= sysrst;
@@ -719,7 +721,7 @@ begin
   ospiclk:  OPAD port map ( I => spi_pf_sck,   PAD => SPI_SCK );
   ospics:   OPAD port map ( I => gpio_o_reg(48),   PAD => SPI_CS );
   ospimosi: OPAD port map ( I => spi_pf_mosi,  PAD => SPI_MOSI );
-  --oled:     OPAD port map ( I => gpio_o_reg(49),   PAD => LED );
+  oled:     OPAD port map ( I => gpio_o_reg(49),   PAD => LED );
 
   zpuino:zpuino_top_icache_spi
     port map (
@@ -804,7 +806,8 @@ begin
 
   gpio_inst: zpuino_gpio
   generic map (
-    gpio_count => zpuino_gpio_count
+    --gpio_count => zpuino_gpio_count
+    gpio_count => 50
   )
   port map (
     wb_clk_i      => wb_clk_i,
@@ -822,9 +825,9 @@ begin
     spp_data  => gpio_bus_in_record.gpio_spp_data(PPSCOUNT_OUT-1 downto 0),
     spp_read  => gpio_bus_out_record.gpio_spp_read(PPSCOUNT_IN-1 downto 0),
 
-    gpio_i      => gpio_bus_in_record.gpio_i,
-    gpio_t      => gpio_bus_out_record.gpio_t,
-    gpio_o        => gpio_o_reg,
+    gpio_i      =>  gpio_bus_in_record.gpio_i,
+    gpio_t      =>   gpio_bus_out_record.gpio_t,
+    gpio_o        =>  gpio_o_reg,
     spp_cap_in    => spp_cap_in,
     spp_cap_out   => spp_cap_out
   );

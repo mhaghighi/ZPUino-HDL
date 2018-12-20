@@ -256,3 +256,23 @@ webtalk.log
 
 planahead/
 zpu/hdl/zpuino/boards/papilio-pro/S6LX9/variants/vanilla.7z
+zpu/hdl/zpuino/programmer/missing
+zpu/hdl/zpuino/programmer/Makefile.in
+zpu/hdl/zpuino/programmer/Makefile
+zpu/hdl/zpuino/programmer/ltmain.sh
+zpu/hdl/zpuino/programmer/libtool
+zpu/hdl/zpuino/programmer/install-sh
+zpu/hdl/zpuino/programmer/INSTALL
+zpu/hdl/zpuino/bootloader/bootloader.hex
+zpu/hdl/zpuino/bootloader/bootloader.s
+zpu/hdl/zpuino/bootloader/bootloader.vhd
+zpu/hdl/zpuino/bootloader/prom-generic-dp-32.vhd
+zpu/hdl/zpuino/programmer/aclocal.m4
+zpu/hdl/zpuino/programmer/buildhelp.txt
+zpu/hdl/zpuino/programmer/config.guess
+zpu/hdl/zpuino/programmer/config.status
+zpu/hdl/zpuino/programmer/config.sub
+zpu/hdl/zpuino/programmer/configure
+zpu/hdl/zpuino/programmer/depcomp
+Papilio/papilio_pro_lx9_vanilla_ise/papilio_pro_lx9_vanilla_ise.gise
+Papilio/papilio_pro_lx9_vanilla_ise/iseconfig/papilio_pro_lx9_vanilla_ise.projectmgr
